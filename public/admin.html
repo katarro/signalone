@@ -1,0 +1,40 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SignalOne Admin</title>
+<link rel="stylesheet" href="./admin.css"/>
+</head><body>
+<header><h1>SignalOne Admin</h1><div id="badge">offline</div></header>
+
+<section class="row">
+  <div class="card">
+    <h2>VLANS</h2>
+    <div id="vlan-list"></div>
+    <form id="vlan-form" class="form">
+      <input required name="vid" type="number" placeholder="VID (e.g. 20)"/>
+      <input required name="name" placeholder="Nombre"/>
+      <input required name="subnet" placeholder="Subred (e.g. 192.168.20.0/24)"/>
+      <label><input type="checkbox" name="dhcp" checked/> DHCP</label>
+      <button type="submit">Agregar VLAN</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>APs</h2>
+    <table id="ap-table"><thead>
+      <tr><th>ID</th><th>Nombre</th><th>IP</th><th>Modelo</th><th>Zona</th><th>VLAN</th><th>Usuario</th><th>Clave</th><th></th></tr>
+    </thead><tbody></tbody></table>
+    <form id="ap-form" class="form">
+      <input required name="name" placeholder="Nombre AP"/>
+      <input required name="ip" placeholder="IP (ej: 192.168.2.11)"/>
+      <input name="model" placeholder="Modelo (opcional)"/>
+      <input name="loc" placeholder="Zona/Lugar"/>
+      <input name="vlan_id" type="number" placeholder="VID"/>
+      <input name="user" placeholder="Usuario" value="ubnt"/>
+      <input name="pass" placeholder="Clave" value="ubnt"/>
+      <button type="submit">Agregar AP</button>
+    </form>
+  </div>
+</section>
+
+<script src="./admin.js"></script>
+</body></html>

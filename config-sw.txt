@@ -1,0 +1,25 @@
+enable
+configure terminal
+hostname zenomy
+enable secret wime2024
+interface vlan 1
+ ip address 192.168.200.5 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 192.168.200.1
+line console 0
+ password wime2024
+ login
+exit
+line vty 0 4
+ password wime2024
+ login
+ transport input ssh telnet
+exit
+banner motd #
+*****************************************
+*           ZENOMY - WIME              *
+*****************************************
+#
+end
+write memory
