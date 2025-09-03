@@ -1,24 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
-sudo install -d -m 755 /opt/signalone
-sudo rsync -a --delete ~/Escritorio/signalone/ /opt/signalone/
-echo -e "API_KEY=change_me\nPORT=8080\nDB_PATH=/opt/signalone/db.sqlite" | sudo tee /etc/signalone.env >/dev/null
-cd /opt/signalone
-sudo npm init -y >/dev/null 2>&1 || true
-sudo npm i express cors better-sqlite3
-sudo tee /etc/systemd/system/signalone-portal.service >/dev/null <<'UNIT'
+
+# Usar directorio del usuario en lugar de /opt
+SIGNALONE_DIR="$HOME/.signalone"
+ENV_FILE="$SIGNALONE_DIR/.env"
+
+# Crear directorio en el home del usuario
+mkdir -p "$SIGNALONE_DIR"
+
+# Copiar archivos al directorio del usuario
+rsync -a --delete ~/Escritorio/signalone/ "$SIGNALONE_DIR/"
+
+# Crear archivo de configuración en el directorio del proyecto
+echo -e "API_KEY=change_me\nPORT=8080\nDB_PATH=$SIGNALONE_DIR/db.sqlite" > "$ENV_FILE"
+
+# Cambiar al directorio e instalar dependencias
+cd "$SIGNALONE_DIR"
+npm init -y >/dev/null 2>&1 || true
+npm i express cors better-sqlite3
+
+# Crear servicio systemd para el usuario actual (sin sudo)
+mkdir -p "$HOME/.config/systemd/user"
+tee "$HOME/.config/systemd/user/signalone-portal.service" >/dev/null <<UNIT
 [Unit]
 Description=SignalOne Admin Portal
 After=network.target
+
 [Service]
-EnvironmentFile=/etc/signalone.env
-WorkingDirectory=/opt/signalone
-ExecStart=/usr/bin/node /opt/signalone/server.cjs
+EnvironmentFile=$ENV_FILE
+WorkingDirectory=$SIGNALONE_DIR
+ExecStart=/usr/bin/node $SIGNALONE_DIR/server.cjs
 Restart=always
-User=root
+
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 UNIT
-sudo systemctl daemon-reload
-sudo systemctl enable --now signalone-portal
-sudo systemctl status -n 20 signalone-portal
+
+# Recargar y habilitar el servicio de usuario
+systemctl --user daemon-reload
+systemctl --user enable --now signalone-portal
+systemctl --user status -n 20 signalone-portal
